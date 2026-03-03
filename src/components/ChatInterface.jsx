@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import axios from "axios";
+import { getAudioUrl, postMessage } from "../routes/chat.js";
 import VoiceButton from "./VoiceButton.jsx";
 import FormPanel from "./FormPanel.jsx";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5050";
 
 export default function ChatInterface({ paramedic, briefing, onShiftComplete }) {
   const [messages, setMessages] = useState([
@@ -20,21 +18,21 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
     const newMessages = [...messages, { role: "user", content }];
     setMessages(newMessages);
     setInput("");
-    const res = await axios.post(`${API_URL}/api/chat/message`, {
+    const data = await postMessage({
       paramedic_id: paramedic.paramedic_id,
       message: content,
       isVoice,
       conversation_id: conversationId
     });
     if (!conversationId) {
-      setConversationId(res.data.conversation_id);
+      setConversationId(data.conversation_id);
     }
-    setMode(res.data.mode || "normal");
-    setExtracted(res.data.extracted || {});
-    setGuardrails(res.data.guardrails || {});
-    setMessages((prev) => [...prev, { role: "assistant", content: res.data.reply }]);
-    if (res.data.audio_url) {
-      const audio = new Audio(`${API_URL}${res.data.audio_url}`);
+    setMode(data.mode || "normal");
+    setExtracted(data.extracted || {});
+    setGuardrails(data.guardrails || {});
+    setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+    if (data.audio_url) {
+      const audio = new Audio(getAudioUrl(data.audio_url));
       audio.play().catch(() => {});
     }
   };

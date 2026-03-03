@@ -1,7 +1,5 @@
 import React from "react";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5050";
+import { sendForms } from "../routes/forms.js";
 
 function fieldColor(confidence) {
   if (confidence === "high") return "#22c55e";
@@ -15,10 +13,7 @@ export default function FormPanel({ paramedicId, extracted, guardrails, onSent }
     guardrails && Object.values(guardrails).every((result) => result.ok === true);
 
   const handleSend = async () => {
-    await axios.post(`${API_URL}/api/forms/send`, {
-      paramedic_id: paramedicId,
-      extracted
-    });
+    await sendForms({ paramedic_id: paramedicId, extracted });
     onSent();
   };
 

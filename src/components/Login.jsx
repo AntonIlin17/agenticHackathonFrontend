@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5050";
+import { login } from "../routes/auth.js";
 
 export default function Login({ onLogin }) {
   const [badge, setBadge] = useState("");
@@ -12,13 +10,11 @@ export default function Login({ onLogin }) {
     event.preventDefault();
     setError("");
     try {
-      const res = await axios.post(`${API_URL}/api/auth/login`, {
-        badge_number: badge,
-        pin
-      });
-      onLogin(res.data.paramedic, res.data.briefing);
+      const data = await login({ badge_number: badge, pin });
+      onLogin(data.paramedic, data.briefing);
     } catch (err) {
-      setError("Login failed. Check badge or PIN.");
+      const message = err?.response?.data?.message || "Login failed. Check badge or PIN.";
+      setError(message);
     }
   };
 
