@@ -37,12 +37,16 @@ export default function Login({ onLogin }) {
         <form onSubmit={handleSubmit}>
           <input
             className="input"
+            id="badge-number"
+            name="badge_number"
             placeholder="Badge Number"
             value={badge}
             onChange={(e) => setBadge(e.target.value)}
           />
           <input
             className="input"
+            id="pin"
+            name="pin"
             placeholder="PIN"
             type="password"
             value={pin}
