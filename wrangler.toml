@@ -1,0 +1,7 @@
+name = "agenticHackathonFrontend"
+main = "worker.js"
+compatibility_date = "2026-03-03"
+
+# Serve the built Vite app from the dist directory
+assets = { directory = "./dist", binding = "ASSETS" }
+
