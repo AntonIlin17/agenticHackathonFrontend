@@ -6,11 +6,22 @@ export default function Login({ onLogin }) {
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
 
+  const normalizeCredential = (value) => {
+    const trimmed = value.trim();
+    if (/^\d+$/.test(trimmed)) {
+      return Number(trimmed);
+    }
+    return trimmed;
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
     try {
-      const data = await login({ badge_number: badge, pin });
+      const data = await login({
+        badge_number: normalizeCredential(badge),
+        pin: normalizeCredential(pin)
+      });
       onLogin(data.paramedic, data.briefing);
     } catch (err) {
       const message = err?.response?.data?.message || "Login failed. Check badge or PIN.";
