@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import { getAudioUrl, postMessage } from "../routes/chat.js";
 import VoiceButton from "./VoiceButton.jsx";
+<<<<<<< HEAD
 import LiveFormPanel from "./LiveFormPanel.jsx";
+=======
+import FormPanel from "./FormPanel.jsx";
+import FormsHub from "./forms/FormsHub.jsx";
+>>>>>>> ea439285f8f9dbf32194de97aefeae3d34788abe
 
 export default function ChatInterface({ paramedic, briefing, onShiftComplete }) {
   const [messages, setMessages] = useState([
@@ -18,22 +23,33 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
     const newMessages = [...messages, { role: "user", content }];
     setMessages(newMessages);
     setInput("");
-    const data = await postMessage({
-      paramedic_id: paramedic.paramedic_id,
-      message: content,
-      isVoice,
-      conversation_id: conversationId
-    });
-    if (!conversationId) {
-      setConversationId(data.conversation_id);
-    }
-    setMode(data.mode || "normal");
-    setExtracted(data.extracted || {});
-    setGuardrails(data.guardrails || {});
-    setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    if (data.audio_url) {
-      const audio = new Audio(getAudioUrl(data.audio_url));
-      audio.play().catch(() => {});
+    try {
+      const data = await postMessage({
+        paramedic_id: paramedic.paramedic_id,
+        message: content,
+        isVoice,
+        conversation_id: conversationId
+      });
+      if (!conversationId) {
+        setConversationId(data.conversation_id);
+      }
+      setMode(data.mode || "normal");
+      setExtracted(data.extracted || {});
+      setGuardrails(data.guardrails || {});
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      if (data.audio_url) {
+        const audio = new Audio(getAudioUrl(data.audio_url));
+        audio.play().catch(() => {});
+      }
+    } catch (err) {
+      console.error("Chat error", err);
+      const msg =
+        err?.response?.data?.message ||
+        "ParaHelper couldn't reply because the backend chat service failed.";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: msg }
+      ]);
     }
   };
 
@@ -81,7 +97,30 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
           </div>
         </div>
 
+<<<<<<< HEAD
         <LiveFormPanel extracted={extracted} />
+=======
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <FormsHub
+            paramedic={paramedic}
+            onSystemMessage={(content) =>
+              setMessages((prev) => [...prev, { role: "assistant", content }])
+            }
+          />
+
+          <FormPanel
+            paramedicId={paramedic.paramedic_id}
+            extracted={extracted}
+            guardrails={guardrails}
+            onSent={() =>
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: "Forms sent. Anything else?" }
+              ])
+            }
+          />
+        </div>
+>>>>>>> ea439285f8f9dbf32194de97aefeae3d34788abe
       </div>
     </div>
   );
