@@ -146,24 +146,20 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
               <div className="chat-voice-row">
                 <button
                   type="button"
-                  className={`chat-circle-btn ${isAiActive ? "chat-circle-btn--active" : ""}`}
+                  className={`chat-circle-btn chat-orb ${isAiActive ? "chat-circle-btn--active" : ""}`}
                   onClick={toggleVoice}
                   disabled={sending}
                   aria-label={listening ? "Stop listening" : "Start voice input"}
                 >
-                  {isAiActive ? (
-                    <video
-                      className="chat-circle-video"
-                      src={recordingVideo}
-                      autoPlay
-                      muted
-                      loop
-                      playsInline
-                      aria-hidden
-                    />
-                  ) : (
-                    <span className="chat-circle-icon" aria-hidden>🎤</span>
-                  )}
+                  <video
+                    className="chat-circle-video"
+                    src={recordingVideo}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    aria-hidden
+                  />
                 </button>
                 <button
                   type="button"
@@ -201,6 +197,14 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
                 </button>
               </div>
             )}
+            <button
+              type="button"
+              className="chat-occurrence-trigger"
+              onClick={() => sendMessage("I need to file an EMS occurrence report", false)}
+              disabled={sending}
+            >
+              Start EMS Occurrence Report
+            </button>
           </div>
 
           <div className="chat-messages-wrap">

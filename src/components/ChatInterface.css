@@ -135,24 +135,30 @@
   line-height: 1.4;
 }
 
-/* Main: AI zone + messages */
+/* Main: AI zone centered (Boltshift-style orb in middle) + messages */
 .chat-main {
   display: flex;
   flex-direction: column;
   gap: 20px;
   min-width: 0;
+  justify-content: flex-start;
 }
 
 .chat-ai-zone {
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 16px;
-  padding: 24px;
-  backdrop-filter: blur(8px);
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 24px 24px 16px;
+  backdrop-filter: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 280px;
 }
 
 .chat-ai-label {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   font-size: 1rem;
   font-weight: 600;
   color: #f8fafc;
@@ -162,44 +168,75 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
 }
 
-/* Circle recording button – video when active */
+/* Central orb – recording video only, Boltshift-style glowing blue orb */
 .chat-circle-btn {
-  width: 140px;
-  height: 140px;
+  width: 200px;
+  height: 200px;
   border-radius: 50%;
-  border: 3px solid rgba(59, 130, 246, 0.5);
-  background: rgba(15, 23, 42, 0.9);
+  border: none;
+  background: transparent;
   cursor: pointer;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s, box-shadow 0.2s;
   padding: 0;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  /* Concentric glow like Boltshift orb */
+  box-shadow:
+    0 0 20px rgba(59, 130, 246, 0.4),
+    0 0 40px rgba(59, 130, 246, 0.3),
+    0 0 60px rgba(59, 130, 246, 0.2),
+    0 0 80px rgba(59, 130, 246, 0.15),
+    inset 0 0 30px rgba(59, 130, 246, 0.1);
+}
+
+.chat-circle-btn.chat-orb {
+  box-shadow:
+    0 0 24px rgba(59, 130, 246, 0.5),
+    0 0 48px rgba(59, 130, 246, 0.35),
+    0 0 72px rgba(59, 130, 246, 0.25),
+    0 0 100px rgba(59, 130, 246, 0.15),
+    inset 0 0 40px rgba(59, 130, 246, 0.08);
 }
 
 .chat-circle-btn:hover:not(:disabled) {
-  border-color: #3b82f6;
-  box-shadow: 0 0 32px rgba(59, 130, 246, 0.4);
+  transform: scale(1.02);
+  box-shadow:
+    0 0 28px rgba(59, 130, 246, 0.55),
+    0 0 56px rgba(59, 130, 246, 0.4),
+    0 0 84px rgba(59, 130, 246, 0.3),
+    0 0 120px rgba(59, 130, 246, 0.2),
+    inset 0 0 40px rgba(59, 130, 246, 0.12);
 }
 
 .chat-circle-btn--active {
-  border-color: #3b82f6;
-  box-shadow: 0 0 40px rgba(59, 130, 246, 0.5);
+  box-shadow:
+    0 0 32px rgba(59, 130, 246, 0.6),
+    0 0 64px rgba(59, 130, 246, 0.45),
+    0 0 96px rgba(59, 130, 246, 0.35),
+    0 0 128px rgba(59, 130, 246, 0.2),
+    inset 0 0 50px rgba(59, 130, 246, 0.15);
+  animation: chat-orb-pulse 2s ease-in-out infinite;
+}
+
+@keyframes chat-orb-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.92; }
 }
 
 .chat-circle-video {
   width: 100%;
   height: 100%;
   object-fit: cover;
-}
-
-.chat-circle-icon {
-  font-size: 3rem;
-  line-height: 1;
+  border-radius: 50%;
+  display: block;
 }
 
 .chat-type-row {
@@ -271,6 +308,29 @@
 
 .chat-switch-mode-btn:hover {
   color: #bfdbfe;
+}
+
+.chat-occurrence-trigger {
+  margin-top: 12px;
+  padding: 10px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #93c5fd;
+  background: transparent;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.chat-occurrence-trigger:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.15);
+  color: #bfdbfe;
+}
+
+.chat-occurrence-trigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Messages */
