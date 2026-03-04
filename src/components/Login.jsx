@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { login } from "../routes/auth.js";
-import Capabilities from "./Capabilities.jsx";
+import fireflyVideo from "../assets/Firefly 644697.mp4";
+import "./Login.css";
 
 export default function Login({ onLogin }) {
   const [paramedicId, setParamedicId] = useState("");
@@ -21,27 +22,36 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <div className="app-shell" style={{ alignItems: "center", justifyContent: "center" }}>
-      <div className="card" style={{ width: "360px" }}>
-        <h2>ParaHelper</h2>
-        <p>Paramedic login</p>
-        <form onSubmit={handleSubmit}>
+    <div className="login-page">
+      <video
+        className="login-video"
+        src={fireflyVideo}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden
+      />
+      <div className="login-overlay" aria-hidden />
+      <div className="login-content">
+        <h1 className="login-title">Welcome I am ParaHelper</h1>
+        <p className="login-subtitle">Please insert paramedic ID to access.</p>
+        <form onSubmit={handleSubmit} className="login-form">
           <input
-            className="input"
+            className="login-input"
             id="paramedic-id"
             name="paramedic_id"
+            type="text"
             placeholder="Paramedic ID (e.g., P-001)"
             value={paramedicId}
             onChange={(e) => setParamedicId(e.target.value)}
+            autoComplete="off"
           />
-          {error && <div style={{ color: "#f87171", marginBottom: "8px" }}>{error}</div>}
-          <button className="btn" type="submit">
+          {error && <p className="login-error">{error}</p>}
+          <button className="login-btn" type="submit">
             Start Shift
           </button>
         </form>
-      </div>
-      <div style={{ width: "480px", marginLeft: "24px" }}>
-        <Capabilities />
       </div>
     </div>
   );

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getAudioUrl, postMessage } from "../routes/chat.js";
-import VoiceButton from "./VoiceButton.jsx";
 import FormPanel from "./FormPanel.jsx";
 import FormsHub from "./forms/FormsHub.jsx";
+import recordingVideo from "../assets/Recording 2026-03-03 144646.mp4";
+import "./ChatInterface.css";
 
 export default function ChatInterface({ paramedic, briefing, onShiftComplete }) {
   const [messages, setMessages] = useState([
@@ -13,11 +14,31 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
   const [extracted, setExtracted] = useState({});
   const [guardrails, setGuardrails] = useState({});
   const [mode, setMode] = useState("normal");
+  const [inputMode, setInputMode] = useState("voice"); // "voice" | "type"
+  const [listening, setListening] = useState(false);
+  const [sending, setSending] = useState(false);
+  const recognitionRef = useRef(null);
+  const sendMessageRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.continuous = false;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      if (transcript && sendMessageRef.current) sendMessageRef.current(transcript, true);
+    };
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+  }, []);
 
   const sendMessage = async (content, isVoice = false) => {
-    if (!content) return;
-    const newMessages = [...messages, { role: "user", content }];
-    setMessages(newMessages);
+    if (!content || sending) return;
+    setSending(true);
+    setMessages((prev) => [...prev, { role: "user", content }]);
     setInput("");
     try {
       const data = await postMessage({
@@ -26,13 +47,14 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
         isVoice,
         conversation_id: conversationId
       });
-      if (!conversationId) {
-        setConversationId(data.conversation_id);
-      }
+      if (!conversationId) setConversationId(data.conversation_id);
       setMode(data.mode || "normal");
       setExtracted(data.extracted || {});
       setGuardrails(data.guardrails || {});
-      const replyText = data.reply != null && typeof data.reply === "string" ? data.reply : "No reply from ParaHelper.";
+      const replyText =
+        data.reply != null && typeof data.reply === "string"
+          ? data.reply
+          : "No reply from ParaHelper.";
       setMessages((prev) => [...prev, { role: "assistant", content: replyText }]);
       if (data.audio_url) {
         const audio = new Audio(getAudioUrl(data.audio_url));
@@ -44,65 +66,168 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
         err?.userMessage ||
         err?.response?.data?.message ||
         "ParaHelper couldn't reply because the backend chat service failed.";
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: msg }
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: msg }]);
+    } finally {
+      setSending(false);
+    }
+  };
+  sendMessageRef.current = sendMessage;
+
+  const toggleVoice = () => {
+    if (!recognitionRef.current) return;
+    if (listening) {
+      recognitionRef.current.stop();
+      setListening(false);
+    } else {
+      recognitionRef.current.start();
+      setListening(true);
     }
   };
 
+  const handleTypeSubmit = (e) => {
+    e.preventDefault();
+    if (input.trim()) sendMessage(input.trim(), false);
+  };
+
+  const isAiActive = listening || sending;
+  const paramedicInitials = [paramedic.first_name, paramedic.last_name]
+    .map((n) => (n || "").charAt(0))
+    .join("")
+    .toUpperCase() || "P";
+
   return (
-    <div className="app-shell" style={{ padding: "24px" }}>
-      <div className="card" style={{ marginBottom: "16px" }}>
-        <strong>
-          {paramedic.first_name} {paramedic.last_name} · {paramedic.role}
-        </strong>
-        <span style={{ marginLeft: "12px", color: "#94a3b8" }}>
+    <div className="chat-interface app-shell">
+      <header className="chat-header">
+        <span className="chat-header-mode">
           Mode: {mode === "stress" ? "Stress" : "Normal"}
         </span>
         <button
-          className="btn secondary"
-          style={{ float: "right" }}
+          type="button"
+          className="chat-header-end-btn"
           onClick={onShiftComplete}
         >
           End Shift
         </button>
-      </div>
+      </header>
 
-      <div className="layout">
-        <div className="card" style={{ minHeight: "60vh" }}>
-          <div style={{ maxHeight: "50vh", overflowY: "auto" }}>
-            {messages.map((msg, idx) => (
-              <div key={idx} style={{ marginBottom: "12px" }}>
-                <strong>{msg.role === "user" ? "You" : "ParaHelper"}:</strong>{" "}
-                {msg.content}
+      <div className="chat-layout">
+        {/* Left: Paramedic profile card */}
+        <aside className="chat-profile-card">
+          <div className="chat-profile-photo-wrap">
+            {paramedic.photo_url ? (
+              <img
+                src={paramedic.photo_url}
+                alt={`${paramedic.first_name} ${paramedic.last_name}`}
+                className="chat-profile-photo"
+              />
+            ) : (
+              <div className="chat-profile-initials">{paramedicInitials}</div>
+            )}
+          </div>
+          <h2 className="chat-profile-name">
+            {paramedic.first_name} {paramedic.last_name}
+          </h2>
+          <p className="chat-profile-role">{paramedic.role || "Paramedic"}</p>
+          <p className="chat-profile-desc">
+            {paramedic.station
+              ? `Station ${paramedic.station} · On shift`
+              : "Paramedic on duty. Use voice or type to talk to ParaHelper."}
+          </p>
+        </aside>
+
+        {/* Center: AI interaction + conversation */}
+        <main className="chat-main">
+          <div className="chat-ai-zone">
+            <p className="chat-ai-label">
+              {inputMode === "voice" ? "Speak to ParaHelper" : "Type your message"}
+            </p>
+
+            {inputMode === "voice" ? (
+              <div className="chat-voice-row">
+                <button
+                  type="button"
+                  className={`chat-circle-btn ${isAiActive ? "chat-circle-btn--active" : ""}`}
+                  onClick={toggleVoice}
+                  disabled={sending}
+                  aria-label={listening ? "Stop listening" : "Start voice input"}
+                >
+                  {isAiActive ? (
+                    <video
+                      className="chat-circle-video"
+                      src={recordingVideo}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      aria-hidden
+                    />
+                  ) : (
+                    <span className="chat-circle-icon" aria-hidden>🎤</span>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  className="chat-switch-mode-btn"
+                  onClick={() => setInputMode("type")}
+                >
+                  Prefer to type?
+                </button>
               </div>
-            ))}
+            ) : (
+              <div className="chat-type-row">
+                <form onSubmit={handleTypeSubmit} className="chat-type-form">
+                  <input
+                    type="text"
+                    className="chat-type-input"
+                    placeholder="Type your message..."
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    disabled={sending}
+                  />
+                  <button
+                    type="submit"
+                    className="chat-type-send"
+                    disabled={sending || !input.trim()}
+                  >
+                    Send
+                  </button>
+                </form>
+                <button
+                  type="button"
+                  className="chat-switch-mode-btn"
+                  onClick={() => setInputMode("voice")}
+                >
+                  Use voice instead
+                </button>
+              </div>
+            )}
           </div>
 
-          <div style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
-            <input
-              className="input"
-              style={{ marginBottom: 0 }}
-              placeholder="Type here..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-            />
-            <button className="btn" onClick={() => sendMessage(input, false)}>
-              Send
-            </button>
-            <VoiceButton onTranscript={(t) => sendMessage(t, true)} />
+          <div className="chat-messages-wrap">
+            <div className="chat-messages" role="log">
+              {messages.map((msg, idx) => (
+                <div
+                  key={idx}
+                  className={`chat-msg chat-msg--${msg.role}`}
+                >
+                  <strong className="chat-msg-role">
+                    {msg.role === "user" ? "You" : "ParaHelper"}:
+                  </strong>{" "}
+                  <span className="chat-msg-content">{msg.content}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </main>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        {/* Right: Forms */}
+        <aside className="chat-forms-sidebar">
           <FormsHub
             paramedic={paramedic}
             onSystemMessage={(content) =>
               setMessages((prev) => [...prev, { role: "assistant", content }])
             }
           />
-
           <FormPanel
             paramedicId={paramedic.paramedic_id}
             extracted={extracted}
@@ -114,7 +239,7 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
               ])
             }
           />
-        </div>
+        </aside>
       </div>
     </div>
   );

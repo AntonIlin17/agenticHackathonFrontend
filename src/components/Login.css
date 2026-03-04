@@ -1,0 +1,122 @@
+/* Full-screen video login – inspired by dark blue/indigo landing with blue accents */
+
+.login-page {
+  position: fixed;
+  inset: 0;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.login-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  z-index: 0;
+}
+
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(30, 41, 59, 0.85) 0%,
+    rgba(15, 23, 42, 0.9) 40%,
+    rgba(30, 58, 138, 0.75) 100%
+  );
+  z-index: 1;
+}
+
+.login-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2.5rem 2rem;
+  max-width: 420px;
+  width: 90%;
+}
+
+.login-title {
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+}
+
+.login-subtitle {
+  font-size: 1rem;
+  color: rgba(248, 250, 252, 0.85);
+  margin: 0 0 2rem;
+  font-weight: 400;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.login-input {
+  width: 100%;
+  padding: 14px 18px;
+  font-size: 1rem;
+  color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-input::placeholder {
+  color: rgba(148, 163, 184, 0.8);
+}
+
+.login-input:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+}
+
+.login-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+
+.login-error {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #f87171;
+}
+
+.login-btn {
+  padding: 14px 24px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: #2563eb;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.login-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 0 24px rgba(37, 99, 235, 0.4);
+}
+
+.login-btn:active {
+  transform: scale(0.98);
+}
