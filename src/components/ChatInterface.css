@@ -39,6 +39,28 @@
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
 }
 
+.chat-voice-toggle {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(248, 250, 252, 0.8);
+  background: rgba(30, 30, 35, 0.8);
+  border: 1px solid rgba(79, 70, 229, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.chat-voice-toggle:hover {
+  background: rgba(40, 40, 48, 0.9);
+  border-color: rgba(79, 70, 229, 0.6);
+}
+
+.chat-voice-toggle--on {
+  border-color: rgba(99, 102, 241, 0.6);
+  color: #c7d2fe;
+}
+
 .chat-layout {
   display: grid;
   grid-template-columns: 280px 1fr 340px;
@@ -171,6 +193,12 @@
   justify-content: center;
   gap: 20px;
   width: 100%;
+}
+
+.chat-voice-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: rgba(248, 250, 252, 0.7);
 }
 
 /* Central orb – PulseAI-style: dark blue-indigo frame + blue/purple glow */

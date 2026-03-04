@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { getAudioUrl, postMessage } from "../routes/chat.js";
+import { postMessage } from "../routes/chat.js";
 import FormPanel from "./FormPanel.jsx";
 import FormsHub from "./forms/FormsHub.jsx";
 import recordingVideo from "../assets/Recording 2026-03-03 144646.mp4";
@@ -17,8 +17,20 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
   const [inputMode, setInputMode] = useState("voice"); // "voice" | "type"
   const [listening, setListening] = useState(false);
   const [sending, setSending] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true); // AI speaks replies when ON
   const recognitionRef = useRef(null);
   const sendMessageRef = useRef(null);
+
+  function speak(text) {
+    if (!voiceEnabled || !text || typeof text !== "string") return;
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    utterance.lang = "en-US";
+    window.speechSynthesis.speak(utterance);
+  }
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -56,10 +68,7 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
           ? data.reply
           : "No reply from ParaHelper.";
       setMessages((prev) => [...prev, { role: "assistant", content: replyText }]);
-      if (data.audio_url) {
-        const audio = new Audio(getAudioUrl(data.audio_url));
-        audio.play().catch(() => {});
-      }
+      speak(replyText);
     } catch (err) {
       console.error("Chat error", err);
       const msg =
@@ -67,6 +76,7 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
         err?.response?.data?.message ||
         "ParaHelper couldn't reply because the backend chat service failed.";
       setMessages((prev) => [...prev, { role: "assistant", content: msg }]);
+      speak(msg);
     } finally {
       setSending(false);
     }
@@ -101,6 +111,14 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
         <span className="chat-header-mode">
           Mode: {mode === "stress" ? "Stress" : "Normal"}
         </span>
+        <button
+          type="button"
+          className={`chat-voice-toggle ${voiceEnabled ? "chat-voice-toggle--on" : ""}`}
+          onClick={() => setVoiceEnabled((v) => !v)}
+          title={voiceEnabled ? "AI voice on – click to turn off" : "AI voice off – click to turn on"}
+        >
+          {voiceEnabled ? "🔊 Voice on" : "🔊 Voice off"}
+        </button>
         <button
           type="button"
           className="chat-header-end-btn"
@@ -144,6 +162,7 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
 
             {inputMode === "voice" ? (
               <div className="chat-voice-row">
+                <p className="chat-voice-hint">Tap the circle to speak, or switch to text below.</p>
                 <button
                   type="button"
                   className={`chat-circle-btn chat-orb ${isAiActive ? "chat-circle-btn--active" : ""}`}
@@ -228,20 +247,20 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
         <aside className="chat-forms-sidebar">
           <FormsHub
             paramedic={paramedic}
-            onSystemMessage={(content) =>
-              setMessages((prev) => [...prev, { role: "assistant", content }])
-            }
+            onSystemMessage={(content) => {
+              setMessages((prev) => [...prev, { role: "assistant", content }]);
+              speak(content);
+            }}
           />
           <FormPanel
             paramedicId={paramedic.paramedic_id}
             extracted={extracted}
             guardrails={guardrails}
-            onSent={() =>
-              setMessages((prev) => [
-                ...prev,
-                { role: "assistant", content: "Forms sent. Anything else?" }
-              ])
-            }
+            onSent={() => {
+              const content = "Forms sent. Anything else?";
+              setMessages((prev) => [...prev, { role: "assistant", content }]);
+              speak(content);
+            }}
           />
         </aside>
       </div>
