@@ -19,22 +19,33 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
     const newMessages = [...messages, { role: "user", content }];
     setMessages(newMessages);
     setInput("");
-    const data = await postMessage({
-      paramedic_id: paramedic.paramedic_id,
-      message: content,
-      isVoice,
-      conversation_id: conversationId
-    });
-    if (!conversationId) {
-      setConversationId(data.conversation_id);
-    }
-    setMode(data.mode || "normal");
-    setExtracted(data.extracted || {});
-    setGuardrails(data.guardrails || {});
-    setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
-    if (data.audio_url) {
-      const audio = new Audio(getAudioUrl(data.audio_url));
-      audio.play().catch(() => {});
+    try {
+      const data = await postMessage({
+        paramedic_id: paramedic.paramedic_id,
+        message: content,
+        isVoice,
+        conversation_id: conversationId
+      });
+      if (!conversationId) {
+        setConversationId(data.conversation_id);
+      }
+      setMode(data.mode || "normal");
+      setExtracted(data.extracted || {});
+      setGuardrails(data.guardrails || {});
+      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      if (data.audio_url) {
+        const audio = new Audio(getAudioUrl(data.audio_url));
+        audio.play().catch(() => {});
+      }
+    } catch (err) {
+      console.error("Chat error", err);
+      const msg =
+        err?.response?.data?.message ||
+        "ParaHelper couldn't reply because the backend chat service failed.";
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: msg }
+      ]);
     }
   };
 
