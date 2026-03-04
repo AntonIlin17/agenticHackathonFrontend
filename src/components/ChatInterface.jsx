@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { getAudioUrl, postMessage } from "../routes/chat.js";
 import VoiceButton from "./VoiceButton.jsx";
 import FormPanel from "./FormPanel.jsx";
+import FormsHub from "./forms/FormsHub.jsx";
 
 export default function ChatInterface({ paramedic, briefing, onShiftComplete }) {
   const [messages, setMessages] = useState([
@@ -81,17 +82,26 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
           </div>
         </div>
 
-        <FormPanel
-          paramedicId={paramedic.paramedic_id}
-          extracted={extracted}
-          guardrails={guardrails}
-          onSent={() =>
-            setMessages((prev) => [
-              ...prev,
-              { role: "assistant", content: "Forms sent. Anything else?" }
-            ])
-          }
-        />
+        <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+          <FormsHub
+            paramedic={paramedic}
+            onSystemMessage={(content) =>
+              setMessages((prev) => [...prev, { role: "assistant", content }])
+            }
+          />
+
+          <FormPanel
+            paramedicId={paramedic.paramedic_id}
+            extracted={extracted}
+            guardrails={guardrails}
+            onSent={() =>
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: "Forms sent. Anything else?" }
+              ])
+            }
+          />
+        </div>
       </div>
     </div>
   );
