@@ -1,8 +1,8 @@
-/* Post-login layout: profile card, voice/type options, glassmorphism */
+/* Post-login layout: PulseAI-style dark charcoal + blue/purple orb */
 
 .chat-interface {
   min-height: 100vh;
-  background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+  background: radial-gradient(ellipse 120% 100% at 50% 0%, #2a2a2e 0%, #1c1c1f 35%, #141416 60%, #0d0d0f 100%);
   padding: 0;
 }
 
@@ -12,8 +12,8 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 12px 24px;
-  background: rgba(15, 23, 42, 0.85);
-  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+  background: rgba(13, 13, 15, 0.9);
+  border-bottom: 1px solid rgba(79, 70, 229, 0.2);
 }
 
 .chat-header-mode {
@@ -173,12 +173,12 @@
   width: 100%;
 }
 
-/* Central orb – recording video only, Boltshift-style glowing blue orb */
+/* Central orb – PulseAI-style: dark blue-indigo frame + blue/purple glow */
 .chat-circle-btn {
   width: 200px;
   height: 200px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid rgba(67, 56, 202, 0.7);
   background: transparent;
   cursor: pointer;
   overflow: hidden;
@@ -187,42 +187,47 @@
   justify-content: center;
   padding: 0;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
-  /* Concentric glow like Boltshift orb */
+  transition: transform 0.2s ease, box-shadow 0.3s ease, border-color 0.3s ease;
   box-shadow:
-    0 0 20px rgba(59, 130, 246, 0.4),
-    0 0 40px rgba(59, 130, 246, 0.3),
-    0 0 60px rgba(59, 130, 246, 0.2),
-    0 0 80px rgba(59, 130, 246, 0.15),
-    inset 0 0 30px rgba(59, 130, 246, 0.1);
+    0 0 24px rgba(79, 70, 229, 0.45),
+    0 0 48px rgba(99, 102, 241, 0.35),
+    0 0 72px rgba(139, 92, 246, 0.25),
+    0 0 100px rgba(79, 70, 229, 0.15),
+    inset 0 0 36px rgba(99, 102, 241, 0.12),
+    inset 0 0 60px rgba(139, 92, 246, 0.06);
 }
 
 .chat-circle-btn.chat-orb {
   box-shadow:
-    0 0 24px rgba(59, 130, 246, 0.5),
-    0 0 48px rgba(59, 130, 246, 0.35),
-    0 0 72px rgba(59, 130, 246, 0.25),
-    0 0 100px rgba(59, 130, 246, 0.15),
-    inset 0 0 40px rgba(59, 130, 246, 0.08);
+    0 0 28px rgba(79, 70, 229, 0.5),
+    0 0 56px rgba(99, 102, 241, 0.4),
+    0 0 84px rgba(139, 92, 246, 0.3),
+    0 0 120px rgba(79, 70, 229, 0.2),
+    inset 0 0 40px rgba(99, 102, 241, 0.15),
+    inset 0 0 70px rgba(139, 92, 246, 0.08);
 }
 
 .chat-circle-btn:hover:not(:disabled) {
   transform: scale(1.02);
+  border-color: rgba(99, 102, 241, 0.9);
   box-shadow:
-    0 0 28px rgba(59, 130, 246, 0.55),
-    0 0 56px rgba(59, 130, 246, 0.4),
-    0 0 84px rgba(59, 130, 246, 0.3),
-    0 0 120px rgba(59, 130, 246, 0.2),
-    inset 0 0 40px rgba(59, 130, 246, 0.12);
+    0 0 32px rgba(79, 70, 229, 0.55),
+    0 0 64px rgba(99, 102, 241, 0.45),
+    0 0 96px rgba(139, 92, 246, 0.35),
+    0 0 140px rgba(79, 70, 229, 0.2),
+    inset 0 0 44px rgba(99, 102, 241, 0.18),
+    inset 0 0 72px rgba(139, 92, 246, 0.1);
 }
 
 .chat-circle-btn--active {
+  border-color: rgba(99, 102, 241, 0.95);
   box-shadow:
-    0 0 32px rgba(59, 130, 246, 0.6),
-    0 0 64px rgba(59, 130, 246, 0.45),
-    0 0 96px rgba(59, 130, 246, 0.35),
-    0 0 128px rgba(59, 130, 246, 0.2),
-    inset 0 0 50px rgba(59, 130, 246, 0.15);
+    0 0 36px rgba(79, 70, 229, 0.6),
+    0 0 72px rgba(99, 102, 241, 0.5),
+    0 0 108px rgba(139, 92, 246, 0.4),
+    0 0 144px rgba(79, 70, 229, 0.25),
+    inset 0 0 50px rgba(99, 102, 241, 0.2),
+    inset 0 0 80px rgba(139, 92, 246, 0.12);
   animation: chat-orb-pulse 2s ease-in-out infinite;
 }
 
