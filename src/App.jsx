@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Login from "./components/Login.jsx";
-import ChatInterface from "./components/ChatInterface.jsx";
+import Dashboard from "./components/Dashboard.jsx";
 import ShiftSummary from "./components/ShiftSummary.jsx";
 
 export default function App() {
@@ -16,11 +16,5 @@ export default function App() {
     return <ShiftSummary paramedic={paramedic} onRestart={() => setShiftComplete(false)} />;
   }
 
-  return (
-    <ChatInterface
-      paramedic={paramedic}
-      briefing={briefing}
-      onShiftComplete={() => setShiftComplete(true)}
-    />
-  );
+  return <Dashboard paramedic={paramedic} />;
 }
