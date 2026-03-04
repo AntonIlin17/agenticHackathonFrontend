@@ -36,7 +36,8 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
       setMode(data.mode || "normal");
       setExtracted(data.extracted || {});
       setGuardrails(data.guardrails || {});
-      setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+      const replyText = data.reply != null && typeof data.reply === "string" ? data.reply : "No reply from ParaHelper.";
+      setMessages((prev) => [...prev, { role: "assistant", content: replyText }]);
       if (data.audio_url) {
         const audio = new Audio(getAudioUrl(data.audio_url));
         audio.play().catch(() => {});
