@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { getAudioUrl, postMessage } from "../routes/chat.js";
 import VoiceButton from "./VoiceButton.jsx";
-import FormsHub from "./forms/FormsHub.jsx";
+import LiveFormPanel from "./LiveFormPanel.jsx";
 
 export default function ChatInterface({ paramedic, briefing, onShiftComplete }) {
   const [messages, setMessages] = useState([
@@ -81,12 +81,7 @@ export default function ChatInterface({ paramedic, briefing, onShiftComplete }) 
           </div>
         </div>
 
-        <FormsHub
-          paramedic={paramedic}
-          onSystemMessage={(text) =>
-            setMessages((prev) => [...prev, { role: "assistant", content: text }])
-          }
-        />
+        <LiveFormPanel extracted={extracted} />
       </div>
     </div>
   );
