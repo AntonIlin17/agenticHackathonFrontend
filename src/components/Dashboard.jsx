@@ -40,23 +40,8 @@ export default function Dashboard({ paramedic }) {
 
   const recognitionRef = useRef(null);
   const femaleVoiceRef = useRef(null);
-
-  useEffect(() => {
-    const pickFemaleVoice = () => {
-      const voices = window.speechSynthesis?.getVoices() || [];
-      const female =
-        voices.find((v) => v.lang.startsWith("en") && v.name.toLowerCase().includes("female")) ||
-        voices.find((v) =>
-          v.lang.startsWith("en") &&
-          ["Samantha", "Victoria", "Karen", "Zira", "Aria"].some((n) => v.name.includes(n))
-        ) ||
-        voices.find((v) => v.lang.startsWith("en"));
-      femaleVoiceRef.current = female || null;
-    };
-    pickFemaleVoice();
-    window.speechSynthesis?.addEventListener("voiceschanged", pickFemaleVoice);
-    return () => window.speechSynthesis?.removeEventListener("voiceschanged", pickFemaleVoice);
-  }, []);
+  const greetingRef = useRef(null);
+  const hasSpokenGreetingRef = useRef(false);
 
   function speak(text) {
     if (!voiceEnabled || !text || typeof text !== "string") return;
@@ -73,7 +58,33 @@ export default function Dashboard({ paramedic }) {
   useEffect(() => {
     const greeting = `Hi ${name}, I'm ParaHelper. How can I assist you today?`;
     setMessages([{ role: "assistant", content: greeting }]);
-    speak(greeting);
+    greetingRef.current = greeting;
+    hasSpokenGreetingRef.current = false;
+
+    const pickFemaleVoice = () => {
+      const voices = window.speechSynthesis?.getVoices() || [];
+      const female =
+        voices.find((v) => v.lang.startsWith("en") && v.name.toLowerCase().includes("female")) ||
+        voices.find((v) =>
+          v.lang.startsWith("en") &&
+          ["Samantha", "Victoria", "Karen", "Zira", "Aria"].some((n) => v.name.includes(n))
+        ) ||
+        voices.find((v) => v.lang.startsWith("en"));
+      femaleVoiceRef.current = female || null;
+    };
+
+    const trySpeakGreeting = () => {
+      if (hasSpokenGreetingRef.current || !greetingRef.current) return;
+      pickFemaleVoice();
+      if (!femaleVoiceRef.current) return;
+      hasSpokenGreetingRef.current = true;
+      speak(greetingRef.current);
+    };
+
+    pickFemaleVoice();
+    trySpeakGreeting();
+    window.speechSynthesis?.addEventListener("voiceschanged", trySpeakGreeting);
+    return () => window.speechSynthesis?.removeEventListener("voiceschanged", trySpeakGreeting);
   }, [name]);
 
   useEffect(() => {
