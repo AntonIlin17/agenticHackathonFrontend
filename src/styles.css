@@ -56,6 +56,114 @@ body {
   gap: 20px;
 }
 
+.live-forms {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.form-preview {
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  color: #fff;
+}
+
+.form-header.occurrence {
+  background: #1f4f7a;
+}
+
+.form-header.teddy {
+  background: #1d4ed8;
+}
+
+.form-header.status {
+  background: #0f172a;
+  border-bottom: 1px solid #1f2937;
+}
+
+.form-header.shift {
+  background: #0b1324;
+  border-bottom: 1px solid #1f2937;
+}
+
+.form-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.form-subtitle {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.form-stamp {
+  font-size: 11px;
+  background: rgba(15, 23, 42, 0.3);
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.form-section {
+  padding: 12px 16px;
+  border-top: 1px solid #1f2937;
+}
+
+.section-title {
+  font-size: 11px;
+  color: #93c5fd;
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+}
+
+.form-grid .full {
+  grid-column: 1 / -1;
+}
+
+.form-section label {
+  font-size: 10px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-field {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  font-size: 12px;
+  background: #0b1220;
+  color: #e2e8f0;
+}
+
+.form-field.ok {
+  border-color: #22c55e;
+}
+
+.form-field.warn {
+  border-color: #facc15;
+}
+
+.form-field.missing {
+  border-color: #ef4444;
+}
+
 @media (max-width: 1024px) {
   .layout {
     grid-template-columns: 1fr;
