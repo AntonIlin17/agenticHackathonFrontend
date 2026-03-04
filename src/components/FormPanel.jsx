@@ -12,6 +12,18 @@ export default function FormPanel({ paramedicId, extracted, guardrails, onSent }
   const allClear =
     guardrails && Object.values(guardrails).every((result) => result.ok === true);
 
+  const missingSummary = (formKey) => {
+    const result = guardrails?.[formKey];
+    if (!result) return null;
+    const missing = result.missing || [];
+    const low = result.lowConfidence || [];
+    if (!missing.length && !low.length) return null;
+    return {
+      missing,
+      low
+    };
+  };
+
   const handleSend = async () => {
     await sendForms({ paramedic_id: paramedicId, extracted });
     onSent();
@@ -22,7 +34,9 @@ export default function FormPanel({ paramedicId, extracted, guardrails, onSent }
       <h3>Live Form Filling</h3>
       {!hasForms && <p>No active forms yet.</p>}
       {hasForms &&
-        Object.entries(extracted).map(([formKey, fields]) => (
+        Object.entries(extracted).map(([formKey, fields]) => {
+          const summary = missingSummary(formKey);
+          return (
           <div key={formKey} style={{ marginBottom: "16px" }}>
             <strong>{formKey.replace("_", " ")}</strong>
             {Object.entries(fields).map(([field, info]) => (
@@ -38,8 +52,16 @@ export default function FormPanel({ paramedicId, extracted, guardrails, onSent }
                   : `Missing: ${guardrails[formKey].missing.join(", ")}`}
               </div>
             )}
+            {summary && (
+              <div style={{ fontSize: "12px", marginTop: "6px", color: "#facc15" }}>
+                {summary.missing.length > 0 &&
+                  `Needs: ${summary.missing.join(", ")}.`}
+                {summary.low.length > 0 &&
+                  ` Confirm: ${summary.low.join(", ")}.`}
+              </div>
+            )}
           </div>
-        ))}
+        );})}
       {hasForms && allClear && (
         <button className="btn" onClick={handleSend}>
           Send Forms

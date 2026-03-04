@@ -1,30 +1,21 @@
 import React, { useState } from "react";
 import { login } from "../routes/auth.js";
+import Capabilities from "./Capabilities.jsx";
 
 export default function Login({ onLogin }) {
-  const [badge, setBadge] = useState("");
-  const [pin, setPin] = useState("");
+  const [paramedicId, setParamedicId] = useState("");
   const [error, setError] = useState("");
-
-  const normalizeCredential = (value) => {
-    const trimmed = value.trim();
-    if (/^\d+$/.test(trimmed)) {
-      return Number(trimmed);
-    }
-    return trimmed;
-  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
     try {
       const data = await login({
-        badge_number: normalizeCredential(badge),
-        pin: normalizeCredential(pin)
+        paramedic_id: paramedicId.trim()
       });
       onLogin(data.paramedic, data.briefing);
     } catch (err) {
-      const message = err?.response?.data?.message || "Login failed. Check badge or PIN.";
+      const message = err?.response?.data?.message || "Login failed. Check paramedic ID.";
       setError(message);
     }
   };
@@ -37,26 +28,20 @@ export default function Login({ onLogin }) {
         <form onSubmit={handleSubmit}>
           <input
             className="input"
-            id="badge-number"
-            name="badge_number"
-            placeholder="Badge Number"
-            value={badge}
-            onChange={(e) => setBadge(e.target.value)}
-          />
-          <input
-            className="input"
-            id="pin"
-            name="pin"
-            placeholder="PIN"
-            type="password"
-            value={pin}
-            onChange={(e) => setPin(e.target.value)}
+            id="paramedic-id"
+            name="paramedic_id"
+            placeholder="Paramedic ID (e.g., P-001)"
+            value={paramedicId}
+            onChange={(e) => setParamedicId(e.target.value)}
           />
           {error && <div style={{ color: "#f87171", marginBottom: "8px" }}>{error}</div>}
           <button className="btn" type="submit">
             Start Shift
           </button>
         </form>
+      </div>
+      <div style={{ width: "480px", marginLeft: "24px" }}>
+        <Capabilities />
       </div>
     </div>
   );
